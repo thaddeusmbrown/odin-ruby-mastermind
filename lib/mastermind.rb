@@ -40,23 +40,16 @@ class Game
       guesser = 1
       guesser_type = @player_1.player_type
     end
-    # # # binding.pry
     code = Display.prompt_code_entry(coder, coder_type, 'code', @guess_set)
     turn_count = 1
     loop do
       @board.show_board
-      puts @guess_set.include? code.join()
-      puts @guess_set.length
-      p code
-      # # binding.pry
       guess = Display.prompt_code_entry(guesser, guesser_type, 'guess', @guess_set[0].split(''))
-      ## binding.pry
       temp_code = Array.new(code)
       @board.update_board(guess, temp_code, turn_count)
       if @board.check_victory(turn_count, guesser)
         break
       elsif guesser_type == 'computer'
-        # binding.pry
         @guess_set = @board.refine_guesses(@guess_set, turn_count)
       end
       turn_count += 1
@@ -71,7 +64,6 @@ class Game
     else
       side = @player_1.side == "guess" ? "code" : "guess"
     end
-    # # # binding.pry
     if player_number == 1
       @player_1 = Player.new(name, player_type, side)
     else
@@ -97,17 +89,15 @@ class Board
   end
 
   def update_board(guess, temp_code, turn_count)
-    # binding.pry
     @board[turn_count][0] = guess
     temp_guess = Array.new(guess)
     @board[turn_count][1] = temp_guess.each_with_index.reduce([]) do |arr, (element, index)|
-      # binding.pry
       if temp_code[index] == element
         temp_code[index] = '-'
         temp_guess[index] = ''
         arr.push('b')
       end
-      if index == 3 # need to fix this for r y b b
+      if index == 3
         temp_guess.each do |remaining_element|
           if temp_code.include? remaining_element
             arr.push('w')
@@ -135,13 +125,9 @@ class Board
   end
 
   def refine_guesses(guess_set, turn_count)
-    # binding.pry
     guess = @board[turn_count][0]
     clue = @board[turn_count][1]
     guess_set.select do |element|
-      if element == 'ygbo' || element == 'bgpo'
-        # binding.pry
-      end
       temp_guess = Array.new(guess)
       difference = 4 - element.split('').each_with_index.reduce(0) do |sum, (color, index)|
         if temp_guess.include? color
@@ -203,7 +189,6 @@ class Display
   end
 
   def self.prompt_code_entry(player_number, player_type, code_type, computer_guess)
-    # # binding.pry
     if player_type == "human"
       puts <<-HEREDOC
 
