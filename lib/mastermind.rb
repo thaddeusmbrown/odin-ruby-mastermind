@@ -27,6 +27,15 @@ class Game
   def play
     create_player(1)
     create_player(2)
+    if @player_1.side == "code"
+      code = Display.prompt_code_entry(1)
+    else
+      code = Display.prompt_code_entry(2)
+    end
+    loop do
+      show_board
+      prompt_guess
+    end
   end
 
   def create_player(player_number)
@@ -115,7 +124,30 @@ class Display
     end
   end
 
-  def self.prompt_code_entry
+  def self.prompt_code_entry(player_number)
+    puts <<-HEREDOC
+
+      Player #{player_number}, please enter a code in the format of 'a b c d'
+
+      'b' = blue
+      'g' = green
+      'o' = orange
+      'p' = pink
+      'r' = red
+      'y' = yellow
+
+    HEREDOC
+
+    loop do
+      result = gets.chomp
+      result = result.split()
+      if result.length == 4 && result.all? { |element| ['b', 'g', 'o', 'p', 'r', 'y'].include?(element) }
+        result
+        break
+      else
+        puts "Try again.  Letters must all be in given list and array of length 4"  
+      end
+    end
   end
 
   def self.prompt_guess
