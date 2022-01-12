@@ -28,9 +28,9 @@ class Game
     create_player(1)
     create_player(2)
     if @player_1.side == "code"
-      code = Display.prompt_code_entry(1)
+      code = Display.prompt_code_entry(1, @player_1.player_type)
     else
-      code = Display.prompt_code_entry(2)
+      code = Display.prompt_code_entry(2, @player_1.player_type)
     end
     loop do
       show_board
@@ -84,7 +84,7 @@ class Player
 end
 
 class Display
-
+  COLOR_CHOICES = ['b', 'g', 'o', 'p', 'r', 'y']
   def self.prompt_name(player_number)
     puts "Please provide name of player #{player_number}"
     gets.chomp.downcase
@@ -124,29 +124,37 @@ class Display
     end
   end
 
-  def self.prompt_code_entry(player_number)
-    puts <<-HEREDOC
+  def self.prompt_code_entry(player_number, player_type)
+    if player_type == "human"
+      puts <<-HEREDOC
 
-      Player #{player_number}, please enter a code in the format of 'a b c d'
+        Player #{player_number}, please enter a code in the format of 'a b c d'
 
-      'b' = blue
-      'g' = green
-      'o' = orange
-      'p' = pink
-      'r' = red
-      'y' = yellow
+        'b' = blue
+        'g' = green
+        'o' = orange
+        'p' = pink
+        'r' = red
+        'y' = yellow
 
-    HEREDOC
+      HEREDOC
 
-    loop do
-      result = gets.chomp
-      result = result.split()
-      if result.length == 4 && result.all? { |element| ['b', 'g', 'o', 'p', 'r', 'y'].include?(element) }
-        result
-        break
-      else
-        puts "Try again.  Letters must all be in given list and array of length 4"  
+      loop do
+        result = gets.chomp
+        result = result.split()
+        if result.length == 4 && result.all? { |element| COLOR_CHOICES.include?(element) }
+          result
+          break
+        else
+          puts "Try again.  Letters must all be in given list and array of length 4"  
+        end
       end
+    else
+      code = []
+      (0..3).each do |index|
+        code.push(COLOR_CHOICES[rand(0..5)])
+      end
+      binding.pry
     end
   end
 
