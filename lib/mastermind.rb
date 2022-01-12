@@ -1,5 +1,3 @@
-require 'pry-byebug'
-
 def new_game
   game = Game.new
   game.play
@@ -17,7 +15,7 @@ def replay
 end
 
 class Game
-  COLOR_CHOICES = ['b', 'g', 'o', 'p', 'r', 'y']
+  COLOR_CHOICES = %w[b g o p r y]
   def initialize
     @board = Board.new
     @player_1 = nil
@@ -29,7 +27,7 @@ class Game
     create_player(1)
     create_player(2)
 
-    if @player_1.side == "code"
+    if @player_1.side == 'code'
       coder = 1
       coder_type = @player_1.player_type
       guesser = 2
@@ -52,6 +50,7 @@ class Game
       elsif guesser_type == 'computer'
         @guess_set = @board.refine_guesses(@guess_set, turn_count)
       end
+
       turn_count += 1
     end
   end
@@ -59,11 +58,11 @@ class Game
   def create_player(player_number)
     name = Display.prompt_name(player_number)
     player_type = Display.prompt_human(player_number)
-    if player_number == 1
-      side = Display.prompt_side(player_number)
-    else
-      side = @player_1.side == "guess" ? "code" : "guess"
-    end
+    side = if player_number == 1
+             Display.prompt_side(player_number)
+           else
+             @player_1.side == 'guess' ? 'code' : 'guess'
+           end
     if player_number == 1
       @player_1 = Player.new(name, player_type, side)
     else
@@ -75,15 +74,15 @@ end
 class Board
   VICTORY = Array.new(4, 'b')
   def initialize
-    @board = Hash.new()
+    @board = {}
     (1..12).each do |i|
       @board[i] = [Array.new(4, '_'), Array.new(4, '_')]
     end
   end
 
   def show_board
-    puts "        Guesses                      Clues"
-    @board.each do |key, value|
+    puts '        Guesses                      Clues'
+    @board.each do |_key, value|
       puts "[  #{value[0][0]}  ][  #{value[0][1]}  ][  #{value[0][2]}  ][  #{value[0][3]}  ] || [  #{value[1][0]}  ][  #{value[1][1]}  ][  #{value[1][2]}  ][  #{value[1][3]}  ]"
     end
   end
@@ -104,11 +103,9 @@ class Board
             temp_code.delete_at(temp_code.index(remaining_element))
           end
         end
-        while arr.length < 4
-          arr.push('x')
-        end
+        arr.push('x') while arr.length < 4
       end
-      arr.sort()
+      arr.sort
     end
   end
 
@@ -116,11 +113,11 @@ class Board
     if @board[turn_count][1] == VICTORY
       show_board
       puts "Player #{guesser} wins!"
-      return 1
+      1
     elsif turn_count == 12
       show_board
-      puts "Player #{3-guesser} wins!"
-      return 1
+      puts "Player #{3 - guesser} wins!"
+      1
     end
   end
 
@@ -129,7 +126,7 @@ class Board
     clue = @board[turn_count][1]
     guess_set.select do |element|
       temp_guess = Array.new(guess)
-      difference = 4 - element.split('').each_with_index.reduce(0) do |sum, (color, index)|
+      difference = 4 - element.split('').each_with_index.reduce(0) do |sum, (color, _index)|
         if temp_guess.include? color
           temp_guess.delete_at(temp_guess.index(color))
           sum += 1
@@ -152,7 +149,7 @@ class Player
 end
 
 class Display
-  COLOR_CHOICES = ['b', 'g', 'o', 'p', 'r', 'y']
+  COLOR_CHOICES = %w[b g o p r y]
   def self.prompt_name(player_number)
     puts "Please provide name of Player #{player_number}"
     gets.chomp.downcase
@@ -162,10 +159,10 @@ class Display
     while 1
       puts "Will Player #{player_number} be human or computer?"
       response = gets.chomp.downcase
-      if response == "human"
-        return "human"
-      elsif response == "computer"
-        return "computer"
+      if response == 'human'
+        return 'human'
+      elsif response == 'computer'
+        return 'computer'
       else
         puts "Error: please type 'human' or 'computer'"
       end
@@ -177,10 +174,10 @@ class Display
       while 1
         puts "Will Player #{player_number} be guesser or coder?"
         response = gets.chomp.downcase
-        if response == "guesser"
-          return "guess"
-        elsif response == "coder"
-          return "code"
+        if response == 'guesser'
+          return 'guess'
+        elsif response == 'coder'
+          return 'code'
         else
           puts "Error: please type 'guesser' or 'coder'"
         end
@@ -189,7 +186,7 @@ class Display
   end
 
   def self.prompt_code_entry(player_number, player_type, code_type, computer_guess)
-    if player_type == "human"
+    if player_type == 'human'
       puts <<-HEREDOC
 
         Player #{player_number}, please enter a code in the format of 'a b c d'
@@ -205,26 +202,25 @@ class Display
 
       loop do
         result = gets.chomp
-        result = result.split()
+        result = result.split
         if result.length == 4 && result.all? { |element| COLOR_CHOICES.include?(element) }
           return result
         else
-          puts "Try again.  Letters must all be in given list and array of length 4"  
+          puts 'Try again.  Letters must all be in given list and array of length 4'
         end
       end
     elsif code_type == 'code'
       code = []
-      (0..3).each do |index|
+      (0..3).each do |_index|
         code.push(COLOR_CHOICES[rand(0..5)])
       end
-      return code
+      code
     else
       computer_guess
     end
   end
 
-  def self.declare_victory
-  end
+  def self.declare_victory; end
 end
 
 new_game
